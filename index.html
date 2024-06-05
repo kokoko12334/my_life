@@ -25,6 +25,7 @@
         #birthdate-container {
             text-align: center;
             transition: all 1s ease;
+
         }
 
         .hidden {
@@ -79,25 +80,23 @@
             font-size: 1.00rem;
         }
 
-
-
         #birth-button {
-            /* height: 150; */
-            margin: 10px;
-
+            height: 38px;
+            /* 원하는 높이로 조정하세요 */
         }
     </style>
 </head>
 
 <body>
-    <h2>100년 인생 남은 기간</h2>
+    <h2>100년 인생 남은 시간</h2>
     <div id="birthdate-container">
-
-        <div class="form-group">
-            <input type="text" class="form-control" id="birth-date-picker" placeholder="생년월일">
-            <button id="birth-button" onclick="startLifeGauge()" class="btn btn-primary mx-1 btn-confirm">go</button>
+        <div class="form-group d-flex align-items-center"> <!-- Flexbox를 사용하여 요소들을 수평으로 정렬 -->
+            <input type="text" class="form-control mr-1" id="birth-date-picker" placeholder="생년월일">
+            <button id="birth-button" onclick="startLifeGauge()"
+                class="btn btn-primary btn-confirm d-flex justify-content-center align-items-center">go</button>
         </div>
     </div>
+
 
     <div class="progress">
         <div id="life-progress" class="progress-bar" role="progressbar" style="width: 0%;"></div>
