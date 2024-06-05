@@ -5,9 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>인생 게이지</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+
     <style>
-        
         body {
             display: flex;
             justify-content: center;
@@ -15,7 +19,7 @@
             height: 100vh;
             flex-direction: column;
             background-color: #f8f9fa;
-            font-family: monospace;
+            font-family: Georgia, 'Times New Roman', Times, serif;
         }
 
         #birthdate-container {
@@ -75,16 +79,7 @@
             font-size: 1.00rem;
         }
 
-        #birth-year,
-        #birth-month,
-        #birth-day {
-            margin: 10px;
-            /* 원하는 마진 값으로 변경 */
-            padding: .375rem 3.25rem .375rem .75rem;
-            /* 원하는 패딩 값으로 변경 */
-            width: 150px;
-            /* 원하는 너비 값으로 변경 */
-        }
+
 
         #birth-button {
             /* height: 150; */
@@ -97,19 +92,13 @@
 <body>
     <h2>100년 인생 남은 기간</h2>
     <div id="birthdate-container">
-        <div class="d-flex justify-content-center">
-            <select id="birth-year" class="form-select mx-1 right">
-                <option selected>Year</option>
-            </select>
-            <select id="birth-month" class="form-select mx-1">
-                <option selected>Month</option>
-            </select>
-            <select id="birth-day" class="form-select mx-1">
-                <option selected>Day</option>
-            </select>
+
+        <div class="form-group">
+            <input type="text" class="form-control" id="birth-date-picker" placeholder="생년월일">
             <button id="birth-button" onclick="startLifeGauge()" class="btn btn-primary mx-1 btn-confirm">go</button>
         </div>
     </div>
+
     <div class="progress">
         <div id="life-progress" class="progress-bar" role="progressbar" style="width: 0%;"></div>
     </div>
@@ -117,43 +106,38 @@
     <div id="percentage">살아온 인생: 0%</div>
     <div id="remaining-seconds">남은 시간: <span id="remaining-time"></span>일</div>
 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const yearSelect = document.getElementById('birth-year');
-            const monthSelect = document.getElementById('birth-month');
-            const daySelect = document.getElementById('birth-day');
-
-            for (let year = 1950; year <= 2020; year++) {
-                let option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearSelect.appendChild(option);
-            }
-
-            for (let month = 1; month <= 12; month++) {
-                let option = document.createElement('option');
-                option.value = month;
-                option.textContent = month;
-                monthSelect.appendChild(option);
-            }
-
-            for (let day = 1; day <= 31; day++) {
-                let option = document.createElement('option');
-                option.value = day;
-                option.textContent = day;
-                daySelect.appendChild(option);
-            }
+        $(document).ready(function () {
+            $('#birth-date-picker').datepicker({
+                format: 'yyyy-mm-dd',
+                startView: 2,
+                autoclose: true,
+                todayHighlight: true,
+                clearBtn: true,
+                language: 'ko', // 한국어 지원
+                startDate: new Date(1950, 0, 1),
+                endDate: new Date(2020, 11, 31),
+            });
         });
 
-        function startLifeGauge() {
-            const birthYear = parseInt(document.getElementById('birth-year').value);
-            const birthMonth = parseInt(document.getElementById('birth-month').value) - 1;
-            const birthDay = parseInt(document.getElementById('birth-day').value);
 
-            if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) {
-                alert("입력값이 잘못되었습니다.");
-                return
+        function startLifeGauge() {
+            const date = document.getElementById('birth-date-picker').value;
+            if (!date) {
+                alert('날짜를 선택해주세요.');
+                return;
             }
+            const [birthYear, birthMonth, birthDay] = date.split('-').map(Number);
 
             const birthDate = new Date(birthYear, birthMonth, birthDay);
             const currentDate = new Date();
