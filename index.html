@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인생 게이지</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        #birthdate-container {
+            text-align: center;
+            transition: all 1s ease;
+        }
+
+        .hidden {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+
+        .progress {
+            width: 100%;
+            max-width: 600px;
+            height: 30px;
+            margin-top: 20px;
+            border: 2px solid rgba(108, 117, 125, 0);
+            /* 처음에는 테두리 투명 */
+            border-radius: 5px;
+            overflow: hidden;
+            opacity: 0;
+            /* 처음에는 투명 */
+            transition: border-color 1s ease, opacity 1s ease;
+            /* 테두리와 바디가 서서히 나타나도록 설정 */
+        }
+
+        .progress-bar {
+            background-color: #ffabab;
+            transition: width 1s;
+        }
+
+        #percentage,
+        #remaining-seconds {
+            margin-top: 10px;
+            font-size: 1.5rem;
+            font-family: 'Roboto', sans-serif;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        #percentage.visible,
+        #remaining-seconds.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .progress.visible {
+            border-color: #6c757d;
+            /* 연한 검정색 테두리 */
+            opacity: 1;
+        }
+
+        .btn-confirm {
+            padding: 10px 30px;
+            font-size: 1.00rem;
+        }
+
+        #birth-year,
+        #birth-month,
+        #birth-day {
+            margin: 10px;
+            /* 원하는 마진 값으로 변경 */
+            padding: .375rem 3.25rem .375rem .75rem;
+            /* 원하는 패딩 값으로 변경 */
+            width: 150px;
+            /* 원하는 너비 값으로 변경 */
+        }
+
+        #birth-button {
+            /* height: 150; */
+            margin: 10px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="birthdate-container">
+        <div class="d-flex justify-content-center">
+            <select id="birth-year" class="form-select mx-1 right">
+                <option selected>Year</option>
+            </select>
+            <select id="birth-month" class="form-select mx-1">
+                <option selected>Month</option>
+            </select>
+            <select id="birth-day" class="form-select mx-1">
+                <option selected>Day</option>
+            </select>
+            <button id="birth-button" onclick="startLifeGauge()" class="btn btn-primary mx-1 btn-confirm">go</button>
+        </div>
+    </div>
+    <div class="progress">
+        <div id="life-progress" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+    </div>
+
+    <div id="percentage">살아온 인생: 0%</div>
+    <div id="remaining-seconds">남은 시간: <span id="remaining-time"></span>일</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const yearSelect = document.getElementById('birth-year');
+            const monthSelect = document.getElementById('birth-month');
+            const daySelect = document.getElementById('birth-day');
+
+            for (let year = 1950; year <= 2020; year++) {
+                let option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+
+            for (let month = 1; month <= 12; month++) {
+                let option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            }
+
+            for (let day = 1; day <= 31; day++) {
+                let option = document.createElement('option');
+                option.value = day;
+                option.textContent = day;
+                daySelect.appendChild(option);
+            }
+        });
+
+        function startLifeGauge() {
+            const birthYear = parseInt(document.getElementById('birth-year').value);
+            const birthMonth = parseInt(document.getElementById('birth-month').value) - 1;
+            const birthDay = parseInt(document.getElementById('birth-day').value);
+
+            if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) {
+                alert("입력값은 숫자이어야 합니다.");
+                return
+            }
+
+            const birthDate = new Date(birthYear, birthMonth, birthDay);
+            const currentDate = new Date();
+            const hundredYearsLater = new Date(birthYear + 100, birthMonth, birthDay);
+
+            const totalSeconds = 100 * 365 * 24 * 60 * 60; // 100년을 초로 변환
+            let elapsedSeconds = Math.floor((currentDate - birthDate) / 1000);
+            let remainingSeconds = totalSeconds - elapsedSeconds;
+
+            document.getElementById('birthdate-container').classList.add('hidden');
+
+            setTimeout(() => {
+                document.getElementById('birthdate-container').style.display = 'none';
+                document.querySelector('.progress').classList.add('visible');
+                document.getElementById('percentage').classList.add('visible');
+                document.getElementById('remaining-seconds').classList.add('visible');
+
+                updateGauge(elapsedSeconds, remainingSeconds, totalSeconds);
+            }, 1000);
+        }
+
+        function updateGauge(elapsedSeconds, remainingSeconds, totalSeconds) {
+            const progressBar = document.getElementById('life-progress');
+            const percentageLabel = document.getElementById('percentage');
+            const remainingTimeLabel = document.getElementById('remaining-time');
+            const intervalTime = 1000;
+
+            const interval = setInterval(() => {
+                if (elapsedSeconds < totalSeconds) {
+                    elapsedSeconds++;
+                    remainingSeconds--;
+
+                    const percentage = (elapsedSeconds / totalSeconds) * 100;
+
+                    progressBar.style.width = `${percentage}%`;
+                    percentageLabel.textContent = `살아온 인생: ${percentage.toFixed(6)}%`;
+                    remainingTimeLabel.textContent = (remainingSeconds / 60 / 60 / 24).toFixed(6);
+
+                }
+            }, intervalTime);
+        }
+    </script>
+</body>
+
+</html>
